@@ -22,9 +22,7 @@ interface AxiosProps {
   email: string;
   address: AddressProps;
 }
-interface DataProps {
-  users: AxiosProps[];
-}
+
 
 function App({ text, id = 1 }: AppProps): JSX.Element {
   const [users, setUsers] = useState<AxiosProps[]>([]);
@@ -34,23 +32,24 @@ function App({ text, id = 1 }: AppProps): JSX.Element {
     setCount(count + 1);
   };
   const getUsers = async (): Promise<void> => {
-    const res = await axios.get<DataProps>(
+    //Робимо деструктурізацію response (відповіді): data це одне з полей у відповіді сервера. Там ще є status, headers...
+    const { data } = await axios.get<AxiosProps[]>(
       "https://jsonplaceholder.typicode.com/users"
     );
-    setUsers(res.data.users);
+
+    setUsers(data);
   };
   useEffect(() => {
     getUsers();
   }, []);
 
-  console.log(users);
   return (
     <div className="App">
       <p id={id.toString()}>{text}</p>
       <Child handlerClick={handlerClick} count={count} />
       <ul>
         {users.map((item) => (
-          <li>{item.name}</li>
+          <li key={item.id}>{item.name}</li>
         ))}
       </ul>
     </div>
